@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Front End Programming / React</title>
+  </head>
+  <body>
+    <!-- We will put our React component inside this div. -->
+    <div id="root"></div>
+
+    <!-- Load React & Babel -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+
+    <!-- React component code -->
+    <script type="text/babel">
+    function CheckAge(){
+        const[info, setInfo] = React.useState({
+            name: "",
+            age: ""
+        });
+
+        const[message, setMessage] = React.useState("");
+       
+        const {name, age} = info;
+        const ageNumber = parseInt(age, 10);
+
+        const handleSubmit = (event) => {
+            event.preventDefault();
+            if(name && ageNumber >= 18){
+                setMessage(`Hello ${info.name}`)
+            } else{
+                setMessage("You are too young")
+            }
+        }
+
+        return(
+            <React.Fragment>
+
+            <form onSubmit= {handleSubmit}>
+            {message && <p>{message}</p>}
+            <input
+            type= "text"
+            placeholder= "Name"
+            value= {info.name}
+            onChange = {event => setInfo({...info, name: event.target.value})}
+            />
+            <br></br>
+            <input
+            type= "number"
+            placeholder= "Age"
+            value= {info.age}
+            onChange = {event => setInfo({...info, age: event.target.value})}
+            />
+            <br></br>
+            <input type= "Submit" value= "Submit"/>
+
+            </form>
+            </React.Fragment>
+        )
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<CheckAge/>);
+    </script>
+  </body>
+</html>

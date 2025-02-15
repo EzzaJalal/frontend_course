@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Front End Programming / React</title>
+  </head>
+  <body>
+    <!-- We will put our React component inside this div. -->
+    <div id="root"></div>
+
+    <!-- Load React & Babel -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+
+    <!-- React component code -->
+    <script type="text/babel">
+    function NasaApod(){
+        const [apodData, setApodData] = React.useState({});
+        const [loading, setLoading] = React.useState(false);
+
+        React.useEffect(() => {setLoading(true);fetchData()}, []);
+
+        const fetchData = () => {
+            fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY')
+            .then(response => {
+                if (!response.ok)
+                throw Error("Error in fetch: " + response.statusText);
+
+            return response.json();
+            })
+            .then(data => setApodData(data))
+            .catch(error => console.error(error))
+            .finally(() => setLoading(false))
+           
+        }
+
+         if(loading)
+              return(<div>Loading...</div>);
+              
+        return(
+            <React.Fragment>
+            <h3>NASA APOD</h3>
+            <p>{apodData.explanation}</p>
+            <img src={apodData.url} alt="APOD todays image"/>
+            </React.Fragment>
+        )
+    }
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<NasaApod/>);
+    </script>
+  </body>
+</html>

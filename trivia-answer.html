@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Front End Programming / React</title>
+  </head>
+  <body>
+    <!-- We will put our React component inside this div. -->
+    <div id="root"></div>
+
+    <!-- Load React & Babel -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+
+    <!-- React component code -->
+    <script type="text/babel">
+      function TriviaQuiz() {
+        const [trivia, setTrivia] = React.useState(null);
+        const [loading, setLoading] = React.useState(false);
+        const [error, setError] = React.useState(null);
+        const [showAnswer, setShowAnswer] = React.useState(false);
+
+        const fetchTrivia = () => {
+          setLoading(true);
+          setError(null);
+          setShowAnswer(false); // Hide answer when fetching a new question
+
+          fetch("https://opentdb.com/api.php?amount=1")
+            .then((response) => {
+              if (response.status === 429) {
+                throw new Error("Please try again in a moment!");
+              }
+              if (!response.ok) {
+                throw new Error(
+                  "Error fetching trivia: " + response.statusText
+                );
+              }
+              return response.json();
+            })
+            .then((data) => {
+              if (data.results && data.results.length > 0) {
+                setTrivia(data.results[0]);
+              }
+            })
+            .catch((error) => setError(error.message))
+            .finally(() => setLoading(false));
+        };
+
+        return (
+          <React.Fragment>
+            <div>
+              {trivia && (
+                <div>
+                  <p>Question: {trivia.question}</p>
+                </div>
+              )}
+              <button onClick={fetchTrivia} disabled={loading}>
+                {loading ? "Loading..." : "New Question"}
+              </button>
+              <button onClick={() => setShowAnswer(true)}>Show Answer</button>
+            </div>
+
+            {error && <p style={{ color: "red" }}>{error}</p>}
+
+            {trivia && (
+              <div>{showAnswer && <p>Answer: {trivia.correct_answer}</p>}</div>
+            )}
+          </React.Fragment>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<TriviaQuiz />);
+    </script>
+  </body>
+</html>

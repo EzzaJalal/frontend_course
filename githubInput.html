@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Front End Programming / React</title>
+  </head>
+  <body>
+    <!-- We will put our React component inside this div. -->
+    <div id="root"></div>
+
+    <!-- Load React & Babel -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+
+    <!-- React component code -->
+    <script type="text/babel">
+      function ReposInput() {
+        const [repos, setRepos] = React.useState([]);
+        const [userInput, setUserInput] = React.useState("");
+
+        const fetchRepos = () => {
+          if (!userInput.trim()) return; // Prevent fetching empty queries
+          fetch(`https://api.github.com/search/repositories?q=${userInput}`)
+            .then((response) => {
+              if (!response.ok)
+                throw new Error("Error in fetch: " + response.statusText);
+              return response.json();
+            })
+            .then((responseData) => {
+              setRepos(responseData.items);
+            })
+            .catch((err) => console.error(err));
+        };
+
+        return (
+          <React.Fragment>
+            <h2>Repositories</h2>
+            <input
+              type="text"
+              value={userInput}
+              onChange={(event) => setUserInput(event.target.value || "")}
+            />
+            <button onClick={fetchRepos}>Search</button>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                {repos.map((repo) => (
+                  <tr key={repo.id}>
+                    <td>{repo.full_name}</td>
+                    <td>
+                      <a
+                        href={repo.html_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {repo.html_url}
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </React.Fragment>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<ReposInput />);
+    </script>
+  </body>
+</html>

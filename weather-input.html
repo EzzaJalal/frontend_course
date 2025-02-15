@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Front End Programming / React</title>
+  </head>
+  <body>
+    <!-- We will put our React component inside this div. -->
+    <div id="root"></div>
+
+    <!-- Load React & Babel -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+
+    <!-- React component code -->
+    <script type="text/babel">
+      function WeatherInfo() {
+        const [weather, setWeather] = React.useState();
+        const [loading, setLoading] = React.useState(false);
+        const [error, setError] = React.useState();
+        const [city, setCity] = React.useState("");
+
+        // Declare the fetchWeather function outside useEffect to make it available on button click
+        const fetchWeather = () => {
+          setLoading(true);
+          fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=379199f234f4134175f0d74f20559012&units=metric`
+          )
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  `Error: ${response.status} - ${response.statusText}`
+                );
+              }
+              return response.json();
+            })
+            .then((data) => {
+              setWeather({
+                temperature: data.main.temp, // Celsius temperature
+                condition: data.weather[0].description,
+              });
+            })
+            .catch((error) => setError(error.message))
+            .finally(() => setLoading(false));
+        };
+
+        return (
+          <React.Fragment>
+            <input
+              type="text"
+              value={city}
+              onChange={(event) => setCity(event.target.value)}
+              placeholder="Enter city name"
+            />
+            <button onClick={fetchWeather} disabled={loading}>
+              {loading ? "Loading..." : "Get Weather"}
+            </button>
+
+            {error && <p style={{ color: "red" }}>{error}</p>}
+
+            {weather && !loading && (
+              <div>
+                <h3>{city} Weather</h3>
+                <p>Temperature: {weather.temperature} Celsius</p>
+                <p>Weather: {weather.condition}</p>
+              </div>
+            )}
+          </React.Fragment>
+        );
+      }
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<WeatherInfo />);
+    </script>
+  </body>
+</html>
